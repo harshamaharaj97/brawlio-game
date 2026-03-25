@@ -717,18 +717,20 @@ function resizeMatchCanvas(){
   const arena=document.querySelector('.arena-view');
   const cv=document.getElementById('match-canvas');
   if(!arena||!cv)return;
-  cv.width=arena.offsetWidth||420;
-  cv.height=arena.offsetHeight||400;
+  cv.width=arena.offsetWidth;
+  cv.height=arena.offsetHeight;
 }
 
 // ── MATCH SCENE ──
 function drawMatchScene(){
-  const cv=document.getElementById('match-canvas');
-  if(!cv)return;
   const arena=document.querySelector('.arena-view');
-  if(arena&&(cv.width!==arena.offsetWidth||cv.height!==arena.offsetHeight)){
-    cv.width=arena.offsetWidth;cv.height=arena.offsetHeight;
-  }
+  const cv=document.getElementById('match-canvas');
+  if(!cv||!arena)return;
+  const aw=arena.offsetWidth,ah=arena.offsetHeight;
+  if(!aw||!ah)return;
+  if(cv.width!==aw)cv.width=aw;
+  if(cv.height!==ah)cv.height=ah;
+  const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
   const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
   const tier=getRankTier(myPts);
   drawArenaBackground(ctx,w,h,tier);
