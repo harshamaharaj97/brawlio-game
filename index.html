@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>GROUNDED</title>
+<title>GROUNDED — v29</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0f0a;--card:#111a11;--border:#1e2e1e;--red:#e63946;--gold:#c8a850;--text:#e8f0e8;--muted:#6a8a6a;--green:#2ecc71;--bark:#5c3a1e;--leaf:#2d5a1b;--lightleaf:#4a8a2a}
@@ -168,9 +168,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 }
 .round-lbl{font-size:.62rem;letter-spacing:2px;color:var(--muted)}
 
-/* Section 3 — Arena (fixed height, no flex growth) */
+/* Section 3 — Arena (takes all remaining space after fixed sections) */
 .arena-view{
-  flex:0 0 28vh;
+  flex:1;
   min-height:0;
   position:relative;
   overflow:hidden;
