@@ -343,27 +343,31 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 
 <!-- MATCH -->
 <div class="screen" id="match">
-  <canvas id="match-canvas"></canvas>
   <div class="match-ui">
+    <!-- HP + round info -->
     <div class="hp-section">
       <div class="hp-row">
         <span class="hp-label you">YOU</span>
         <div class="hp-bar"><div class="hp-fill you" id="hp-you" style="width:100%"></div></div>
-        <span class="hp-num" id="hp-you-n">100</span>
+        <span class="hp-num" id="hp-you-n">30</span>
       </div>
       <div class="hp-row" style="flex-direction:row-reverse">
         <span class="hp-label opp">OPP</span>
         <div class="hp-bar"><div class="hp-fill opp" id="hp-opp" style="width:100%"></div></div>
-        <span class="hp-num" id="hp-opp-n">100</span>
+        <span class="hp-num" id="hp-opp-n">30</span>
       </div>
       <div class="round-lbl" id="round-lbl">ROUND 1</div>
     </div>
+    <!-- Arena — canvas lives here only -->
     <div class="arena-view">
+      <canvas id="match-canvas"></canvas>
       <div class="result-banner" id="res-banner">
         <div class="result-hit" id="res-hit"></div>
         <div class="result-detail" id="res-detail"></div>
       </div>
+      <div class="wait-msg" id="wait-msg" style="display:none">⏳ Waiting for opponent...</div>
     </div>
+    <!-- Timer + punch buttons -->
     <div class="punch-section">
       <div class="timer-row">
         <span class="timer-lbl">Select Punch</span>
@@ -377,7 +381,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
         <button class="punch-btn" onclick="selectPunch('uppercut')"><span class="pi">⬆️</span><span class="pn">Upper</span></button>
         <button class="punch-btn" onclick="selectPunch('overhand')"><span class="pi">💥</span><span class="pn">Over</span></button>
       </div>
-      <div class="wait-msg" id="wait-msg" style="display:none">⏳ Waiting for opponent...</div>
     </div>
   </div>
 </div>
@@ -711,16 +714,21 @@ function startMatchLoop(){
 }
 function stopMatchLoop(){if(matchLoopId){cancelAnimationFrame(matchLoopId);matchLoopId=null;}}
 function resizeMatchCanvas(){
+  const arena=document.querySelector('.arena-view');
   const cv=document.getElementById('match-canvas');
-  cv.width=cv.offsetWidth||420;cv.height=cv.offsetHeight||700;
+  if(!arena||!cv)return;
+  cv.width=arena.offsetWidth||420;
+  cv.height=arena.offsetHeight||400;
 }
 
 // ── MATCH SCENE ──
 function drawMatchScene(){
   const cv=document.getElementById('match-canvas');
-  if(!cv||!cv.offsetWidth)return;
-  if(cv.width!==cv.offsetWidth)cv.width=cv.offsetWidth;
-  if(cv.height!==cv.offsetHeight)cv.height=cv.offsetHeight;
+  if(!cv)return;
+  const arena=document.querySelector('.arena-view');
+  if(arena&&(cv.width!==arena.offsetWidth||cv.height!==arena.offsetHeight)){
+    cv.width=arena.offsetWidth;cv.height=arena.offsetHeight;
+  }
   const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
   const tier=getRankTier(myPts);
   drawArenaBackground(ctx,w,h,tier);
