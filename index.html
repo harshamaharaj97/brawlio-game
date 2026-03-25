@@ -168,11 +168,10 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 }
 .round-lbl{font-size:.62rem;letter-spacing:2px;color:var(--muted)}
 
-/* Section 3 — Arena (fills all remaining vertical space) */
+/* Section 3 — Arena (fixed height, no flex growth) */
 .arena-view{
-  flex:1;
+  flex:0 0 28vh;
   min-height:0;
-  max-height:38vh;
   position:relative;
   overflow:hidden;
 }
