@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<!-- GROUNDED — index.html — Version 26 -->
+<!-- GROUNDED — index.html — Version 27 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
 <title>GROUNDED</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0f0a;--card:#111a11;--border:#1e2e1e;--red:#e63946;--gold:#c8a850;--text:#e8f0e8;--muted:#6a8a6a;--green:#2ecc71;--bark:#5c3a1e;--leaf:#2d5a1b;--lightleaf:#4a8a2a}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#app{width:100%;max-width:420px;height:100vh;position:relative;overflow:hidden}
-.screen{display:none;flex-direction:column;align-items:center;width:100%;height:100vh;overflow-y:auto}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#app{width:100%;max-width:420px;height:100vh;height:100dvh;position:relative;overflow:hidden}
+.screen{display:none;flex-direction:column;align-items:center;width:100%;height:100vh;height:100dvh;overflow-y:auto}
 .screen.active{display:flex}
 
 /* MENU */
@@ -126,17 +126,19 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .fb-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--leaf),var(--lightleaf));color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;letter-spacing:2px}
 
 /* ═══════════════════════════════════════════════
-   MATCH SCREEN — Version 26
+   MATCH SCREEN — Version 27
    Layout: 5 stacked, non-overlapping sections.
-   No absolute positioning overlaps between sections.
+   Uses 100dvh for Android nav bar safety.
+   Arena section has hard max-height so it never
+   pushes timer/buttons off screen.
    ═══════════════════════════════════════════════ */
 #match{
   padding:0;
-  position:relative;
   overflow:hidden;
   display:flex;
   flex-direction:column;
   height:100vh;
+  height:100dvh;
 }
 
 /* SECTION 1 — HP BARS */
@@ -187,6 +189,11 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
   width:100%;
   position:relative;
   overflow:hidden;
+  display:block;
+  /* Hard cap: never grow beyond what remains after all UI sections.
+     HP(~68) + Round(~36) + Timer(~38) + Punches(~285) + safe-area(~80) = ~507px reserved.
+     This prevents the canvas from pushing buttons off-screen on short Android viewports. */
+  max-height:calc(100dvh - 507px);
 }
 #match-canvas{
   position:absolute;
@@ -248,7 +255,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .punch-section{
   flex-shrink:0;
   width:100%;
-  padding:7px 11px 10px;
+  padding:7px 11px calc(10px + env(safe-area-inset-bottom, 0px));
   background:rgba(5,10,5,0.97);
   display:flex;
   flex-direction:column;
