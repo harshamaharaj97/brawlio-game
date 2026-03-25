@@ -748,14 +748,14 @@ function drawMatchScene(){
   }
 
   // ── PERSPECTIVE LAYOUT ──
-  // Opponent: centered-right, mid distance — smaller
+  // Opponent: centered-right, mid distance
   const oppScale=w*.22;
-  const oppX=w*.58,oppY=h*.52;
+  const oppX=w*.58,oppY=h*.55;
   drawOakTree(ctx,oppX,oppY,oppScale,true,oppEquippedGlove,oppExt,oppHit,animState.oppPunch,animState.phase);
 
-  // Player: bottom-left foreground, large, seen from behind over right shoulder
-  const myScale=w*.52;
-  const myX=w*.18,myY=h*.92;
+  // Player: bottom-left, large, from behind over right shoulder
+  const myScale=w*.48;
+  const myX=w*.18,myY=h*.95;
   drawOakTreeBack(ctx,myX,myY,myScale,equippedGlove,myExt,myHit,animState.myPunch,animState.phase);
 }
 
