@@ -139,7 +139,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .hp-fill.opp{background:linear-gradient(90deg,#8a1a1a,var(--red));margin-left:auto}
 .hp-num{font-size:.62rem;font-weight:700;min-width:24px;text-align:center;color:var(--muted)}
 .round-lbl{text-align:center;font-size:.62rem;letter-spacing:2px;color:var(--muted);margin-top:3px}
-.arena-view{flex:1;position:relative}
+.arena-view{flex:1;position:relative;min-height:0;overflow:hidden}
 .result-banner{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);border:2px solid var(--gold);border-radius:12px;padding:12px 22px;text-align:center;z-index:10;display:none;pointer-events:none;min-width:200px}
 .result-banner.show{display:block;animation:popIn .25s ease}
 @keyframes popIn{from{transform:translate(-50%,-50%) scale(.6)}to{transform:translate(-50%,-50%) scale(1)}}
@@ -546,7 +546,7 @@ function showTutorial(){
 function drawTutorialPentagon(){
   const cv=document.getElementById('tut-canvas');
   const ctx=cv.getContext('2d');
-  const W=340,H=360,cx=W/2,cy=H/2+28;
+  const W=340,H=380,cx=W/2,cy=H/2+38;
   cv.width=W;cv.height=H;
   const PR=118,NR=26,LR=PR+52;
   const labels=['JAB','CROSS','HOOK','UPPERCUT','OVERHAND'];
