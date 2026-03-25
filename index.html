@@ -124,11 +124,27 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .name-input:focus{border-color:var(--gold)}
 .fb-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--leaf),var(--lightleaf));color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;letter-spacing:2px}
 
-/* MATCH */
-#match{padding:0;position:relative;overflow:hidden}
-#match-canvas{position:absolute;inset:0;width:100%;height:100%}
-.match-ui{position:relative;z-index:2;width:100%;display:flex;flex-direction:column;height:100vh;pointer-events:none}
-.hp-section{padding:12px 14px 0;display:flex;flex-direction:column;gap:5px}
+/* ═══════════════════════════════════════════
+   MATCH SCREEN — 5 stacked sections, no overlap
+   ═══════════════════════════════════════════ */
+#match{
+  padding:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* Section 1 — HP Bars */
+.hp-section{
+  flex-shrink:0;
+  padding:10px 14px 8px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
 .hp-row{display:flex;align-items:center;gap:8px}
 .hp-label{font-size:.62rem;font-weight:700;letter-spacing:1px;min-width:38px}
 .hp-label.you{color:var(--green)}
@@ -138,27 +154,100 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .hp-fill.you{background:linear-gradient(90deg,#1a8a3a,var(--green))}
 .hp-fill.opp{background:linear-gradient(90deg,#8a1a1a,var(--red));margin-left:auto}
 .hp-num{font-size:.62rem;font-weight:700;min-width:24px;text-align:center;color:var(--muted)}
-.round-lbl{text-align:center;font-size:.62rem;letter-spacing:2px;color:var(--muted);margin-top:3px}
-.arena-view{flex:1;position:relative;min-height:0;overflow:hidden}
-.result-banner{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);border:2px solid var(--gold);border-radius:12px;padding:12px 22px;text-align:center;z-index:10;display:none;pointer-events:none;min-width:200px}
+
+/* Section 2 — Round Label */
+.round-section{
+  flex-shrink:0;
+  padding:6px 14px;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+.round-lbl{font-size:.62rem;letter-spacing:2px;color:var(--muted)}
+
+/* Section 3 — Arena (fills all remaining vertical space) */
+.arena-view{
+  flex:1;
+  min-height:0;
+  position:relative;
+  overflow:hidden;
+}
+/* Canvas fills the arena section exactly — no absolute overflow */
+#match-canvas{
+  display:block;
+  width:100%;
+  height:100%;
+}
+.result-banner{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.92);
+  border:2px solid var(--gold);
+  border-radius:12px;
+  padding:12px 22px;
+  text-align:center;
+  z-index:10;
+  display:none;
+  pointer-events:none;
+  min-width:200px;
+}
 .result-banner.show{display:block;animation:popIn .25s ease}
 @keyframes popIn{from{transform:translate(-50%,-50%) scale(.6)}to{transform:translate(-50%,-50%) scale(1)}}
 .result-hit{font-size:1.4rem;font-weight:900}
 .result-detail{font-size:.68rem;color:var(--muted);margin-top:3px;letter-spacing:1px}
-.punch-section{position:absolute;bottom:0;left:0;right:0;padding:9px 11px 14px;background:rgba(5,10,5,.55);border-top:1px solid rgba(255,255,255,.06);pointer-events:all;backdrop-filter:blur(2px)}
-.timer-row{display:flex;align-items:center;margin-bottom:7px;gap:8px}
-.timer-lbl{font-size:.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.wait-msg{
+  position:absolute;
+  bottom:8px;left:0;right:0;
+  text-align:center;
+  font-size:.72rem;
+  color:var(--gold);
+  pointer-events:none;
+}
+
+/* Section 4 — Timer */
+.timer-section{
+  flex-shrink:0;
+  padding:7px 14px 6px;
+  background:rgba(5,10,5,.9);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.timer-row{display:flex;align-items:center;gap:8px}
+.timer-lbl{font-size:.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;white-space:nowrap}
 .timer-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
 .timer-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .1s linear}
 .timer-num{font-size:.62rem;color:var(--gold);font-weight:700;min-width:14px;text-align:right}
-.punch-grid{display:flex;flex-direction:column;gap:6px}
-.punch-btn{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:11px 16px;cursor:pointer;display:flex;flex-direction:row;align-items:center;gap:12px;transition:all .12s;user-select:none;pointer-events:all;width:100%}
+
+/* Section 5 — Punch Buttons */
+.punch-section{
+  flex-shrink:0;
+  padding:7px 11px 10px;
+  background:rgba(5,10,5,.9);
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.punch-grid{display:flex;flex-direction:column;gap:5px}
+.punch-btn{
+  border:1px solid var(--border);
+  background:var(--card);
+  border-radius:10px;
+  padding:9px 16px;
+  cursor:pointer;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:12px;
+  transition:all .12s;
+  user-select:none;
+  width:100%;
+}
 .punch-btn:active{transform:scale(.98);background:rgba(200,168,80,.1)}
 .punch-btn.selected{border-color:var(--gold);background:rgba(200,168,80,.12)}
 .punch-btn.disabled{opacity:.32;pointer-events:none}
-.punch-btn .pi{font-size:1.4rem;min-width:28px;text-align:center}
-.punch-btn .pn{font-size:.78rem;letter-spacing:1.5px;color:var(--text);font-weight:700;text-transform:uppercase;flex:1;text-align:left}
-.wait-msg{text-align:center;font-size:.72rem;color:var(--gold);padding:5px;margin-top:2px}
+.punch-btn .pi{font-size:1.3rem;min-width:26px;text-align:center}
+.punch-btn .pn{font-size:.75rem;letter-spacing:1.5px;color:var(--text);font-weight:700;text-transform:uppercase;flex:1;text-align:left}
 
 /* MATCH END */
 #matchend{justify-content:center;gap:14px;text-align:center;background:var(--bg);padding:40px 24px}
@@ -341,48 +430,58 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
   </div>
 </div>
 
-<!-- MATCH -->
+<!-- MATCH — 5 stacked sections, zero overlap -->
 <div class="screen" id="match">
-  <div class="match-ui">
-    <!-- HP + round info -->
-    <div class="hp-section">
-      <div class="hp-row">
-        <span class="hp-label you">YOU</span>
-        <div class="hp-bar"><div class="hp-fill you" id="hp-you" style="width:100%"></div></div>
-        <span class="hp-num" id="hp-you-n">30</span>
-      </div>
-      <div class="hp-row" style="flex-direction:row-reverse">
-        <span class="hp-label opp">OPP</span>
-        <div class="hp-bar"><div class="hp-fill opp" id="hp-opp" style="width:100%"></div></div>
-        <span class="hp-num" id="hp-opp-n">30</span>
-      </div>
-      <div class="round-lbl" id="round-lbl">ROUND 1</div>
+
+  <!-- SECTION 1: HP BARS -->
+  <div class="hp-section">
+    <div class="hp-row">
+      <span class="hp-label you">YOU</span>
+      <div class="hp-bar"><div class="hp-fill you" id="hp-you" style="width:100%"></div></div>
+      <span class="hp-num" id="hp-you-n">30</span>
     </div>
-    <!-- Arena — canvas lives here only -->
-    <div class="arena-view">
-      <canvas id="match-canvas"></canvas>
-      <div class="result-banner" id="res-banner">
-        <div class="result-hit" id="res-hit"></div>
-        <div class="result-detail" id="res-detail"></div>
-      </div>
-      <div class="wait-msg" id="wait-msg" style="display:none">⏳ Waiting for opponent...</div>
-    </div>
-    <!-- Timer + punch buttons -->
-    <div class="punch-section">
-      <div class="timer-row">
-        <span class="timer-lbl">Select Punch</span>
-        <div class="timer-bar"><div class="timer-fill" id="t-fill" style="width:100%"></div></div>
-        <span class="timer-num" id="t-num">5</span>
-      </div>
-      <div class="punch-grid">
-        <button class="punch-btn" onclick="selectPunch('jab')"><span class="pi">👊</span><span class="pn">Jab</span></button>
-        <button class="punch-btn" onclick="selectPunch('cross')"><span class="pi">🤜</span><span class="pn">Cross</span></button>
-        <button class="punch-btn" onclick="selectPunch('hook')"><span class="pi">🥊</span><span class="pn">Hook</span></button>
-        <button class="punch-btn" onclick="selectPunch('uppercut')"><span class="pi">⬆️</span><span class="pn">Upper</span></button>
-        <button class="punch-btn" onclick="selectPunch('overhand')"><span class="pi">💥</span><span class="pn">Over</span></button>
-      </div>
+    <div class="hp-row" style="flex-direction:row-reverse">
+      <span class="hp-label opp">OPP</span>
+      <div class="hp-bar"><div class="hp-fill opp" id="hp-opp" style="width:100%"></div></div>
+      <span class="hp-num" id="hp-opp-n">30</span>
     </div>
   </div>
+
+  <!-- SECTION 2: ROUND INFO -->
+  <div class="round-section">
+    <div class="round-lbl" id="round-lbl">ROUND 1</div>
+  </div>
+
+  <!-- SECTION 3: ARENA (canvas lives here only, fills flex:1) -->
+  <div class="arena-view">
+    <canvas id="match-canvas"></canvas>
+    <div class="result-banner" id="res-banner">
+      <div class="result-hit" id="res-hit"></div>
+      <div class="result-detail" id="res-detail"></div>
+    </div>
+    <div class="wait-msg" id="wait-msg" style="display:none">⏳ Waiting for opponent...</div>
+  </div>
+
+  <!-- SECTION 4: TIMER -->
+  <div class="timer-section">
+    <div class="timer-row">
+      <span class="timer-lbl">Select Punch</span>
+      <div class="timer-bar"><div class="timer-fill" id="t-fill" style="width:100%"></div></div>
+      <span class="timer-num" id="t-num">5</span>
+    </div>
+  </div>
+
+  <!-- SECTION 5: PUNCH BUTTONS -->
+  <div class="punch-section">
+    <div class="punch-grid">
+      <button class="punch-btn" onclick="selectPunch('jab')"><span class="pi">👊</span><span class="pn">Jab</span></button>
+      <button class="punch-btn" onclick="selectPunch('cross')"><span class="pi">🤜</span><span class="pn">Cross</span></button>
+      <button class="punch-btn" onclick="selectPunch('hook')"><span class="pi">🥊</span><span class="pn">Hook</span></button>
+      <button class="punch-btn" onclick="selectPunch('uppercut')"><span class="pi">⬆️</span><span class="pn">Upper</span></button>
+      <button class="punch-btn" onclick="selectPunch('overhand')"><span class="pi">💥</span><span class="pn">Over</span></button>
+    </div>
+  </div>
+
 </div>
 
 <!-- MATCH END -->
@@ -403,14 +502,14 @@ const BEATS={jab:['hook','uppercut'],cross:['jab','overhand'],hook:['cross','upp
 const PUNCHES=['jab','cross','hook','uppercut','overhand'];
 
 // ── SESSION STATE ──
-const MAX_HP=30; // 3 hits of 10 = match over. change back to 100 for production.
+const MAX_HP=30;
 let myPts=0,myHP=MAX_HP,oppHP=MAX_HP,roundNum=0;
 let myPunch=null,oppPunch=null,timerInt=null,timerLeft=5;
 let ws=null,matchReady=false;
 let streetName='Anonymous';
 let firstBloodClaimed=false,matchesPlayed=0;
 let equippedGlove='bare';
-let oppEquippedGlove='bare'; // received from opponent at match start
+let oppEquippedGlove='bare';
 let bandageUnlocked=false;
 let animState={phase:'idle',myPunch:null,oppPunch:null,result:null,frame:0,maxFrames:45};
 
@@ -457,7 +556,6 @@ function connectWS(onOpen){
 function closeWS(){if(ws){try{ws.close();}catch(e){}ws=null;}}
 function sendWS(obj){if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify(obj));}
 
-// opponent cosmetics: wait for player_info before starting match
 let oppInfoReceived=false;
 
 function handleServerMsg(m){
@@ -465,9 +563,7 @@ function handleServerMsg(m){
   if(m.type==='match_found'){
     matchReady=true;
     oppInfoReceived=false;
-    // Send our cosmetic info
     sendWS({type:'player_info',glove:equippedGlove});
-    // Wait briefly for opponent info then start
     setTimeout(()=>startMatch(),900);
   }
   if(m.type==='player_info'){
@@ -561,19 +657,15 @@ function drawTutorialPentagon(){
   function lpt(i){const a=-Math.PI/2+(2*Math.PI*i/5);const[ox,oy]=LABEL_OFFSETS[i];return{x:cx+LR*Math.cos(a)+ox,y:cy+LR*Math.sin(a)+oy};}
   const pts=Array.from({length:5},(_,i)=>pt(i));
   const lpts=Array.from({length:5},(_,i)=>lpt(i));
-  // BG
   const bg=ctx.createRadialGradient(cx,cy,5,cx,cy,200);
   bg.addColorStop(0,'#131f13');bg.addColorStop(1,'#0a0f0a');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  // Title — raised to top
   ctx.fillStyle='#c8a850';ctx.font='bold 13px Segoe UI';ctx.textAlign='center';
   ctx.fillText('PUNCH MATRIX — Arrow = Wins',cx,18);
   ctx.fillStyle='#5a7a5a';ctx.font='10px Segoe UI';
   ctx.fillText('Same punch = DRAW (both take damage)',cx,32);
-  // Pentagon outline
   ctx.strokeStyle='rgba(200,168,80,.1)';ctx.lineWidth=1;
   ctx.beginPath();pts.forEach((p,i)=>{i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});ctx.closePath();ctx.stroke();
-  // Arrows
   function drawArrow(fi,ti,col){
     const f=pts[fi],t=pts[ti];
     const dx=t.x-f.x,dy=t.y-f.y,len=Math.sqrt(dx*dx+dy*dy);
@@ -592,7 +684,6 @@ function drawTutorialPentagon(){
     ctx.restore();
   }
   pts.forEach((_,i)=>BEATS_T[i].forEach(j=>drawArrow(i,j,colors[i])));
-  // Nodes
   pts.forEach((p,i)=>{
     const glow=ctx.createRadialGradient(p.x,p.y,3,p.x,p.y,NR+10);
     glow.addColorStop(0,colors[i]+'44');glow.addColorStop(1,'rgba(0,0,0,0)');
@@ -601,7 +692,6 @@ function drawTutorialPentagon(){
     ctx.strokeStyle=colors[i];ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,NR,0,Math.PI*2);ctx.stroke();
     ctx.font='16px serif';ctx.textAlign='center';ctx.fillText(icons[i],p.x,p.y+6);
   });
-  // Labels
   lpts.forEach((lp,i)=>{
     ctx.font='bold 9px Segoe UI';ctx.fillStyle=colors[i];ctx.textAlign='center';
     ctx.fillText(labels[i],lp.x,lp.y-4);
@@ -628,8 +718,12 @@ function startMatch(){
   myHP=MAX_HP;oppHP=MAX_HP;roundNum=0;myPunch=null;oppPunch=null;
   animState={phase:'idle',myPunch:null,oppPunch:null,result:null,frame:0,maxFrames:45};
   updateHP();showScreen('match');
-  resizeMatchCanvas();
-  setTimeout(()=>{startMatchLoop();newRound();},100);
+  // Let the flex layout settle before sizing the canvas
+  requestAnimationFrame(()=>{
+    resizeMatchCanvas();
+    startMatchLoop();
+    newRound();
+  });
 }
 function newRound(){
   roundNum++;myPunch=null;oppPunch=null;
@@ -713,30 +807,36 @@ function startMatchLoop(){
   loop();
 }
 function stopMatchLoop(){if(matchLoopId){cancelAnimationFrame(matchLoopId);matchLoopId=null;}}
+
 function resizeMatchCanvas(){
   const arena=document.querySelector('.arena-view');
   const cv=document.getElementById('match-canvas');
   if(!arena||!cv)return;
-  cv.width=arena.offsetWidth||420;
-  cv.height=arena.offsetHeight||400;
+  // Match canvas pixel dimensions to the arena-view's actual rendered size
+  const rect=arena.getBoundingClientRect();
+  cv.width=Math.round(rect.width)||420;
+  cv.height=Math.round(rect.height)||300;
 }
 
 // ── MATCH SCENE ──
 function drawMatchScene(){
   const cv=document.getElementById('match-canvas');
   if(!cv)return;
+  // Keep canvas in sync with container if it ever changes (e.g. orientation)
   const arena=document.querySelector('.arena-view');
-  if(arena&&(cv.width!==arena.offsetWidth||cv.height!==arena.offsetHeight)){
-    cv.width=arena.offsetWidth;cv.height=arena.offsetHeight;
+  if(arena){
+    const rect=arena.getBoundingClientRect();
+    const w=Math.round(rect.width),h=Math.round(rect.height);
+    if(w>0&&h>0&&(cv.width!==w||cv.height!==h)){cv.width=w;cv.height=h;}
   }
   const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
+  if(w===0||h===0)return;
   const tier=getRankTier(myPts);
   drawArenaBackground(ctx,w,h,tier);
 
   const t=animState.frame/animState.maxFrames;
   const ease=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 
-  // Punch extension amounts per type
   function punchExt(p){return{jab:32,cross:42,hook:26,uppercut:18,overhand:36}[p]||28;}
 
   let myExt=0,oppExt=0,myHit=false,oppHit=false;
@@ -747,15 +847,14 @@ function drawMatchScene(){
     else{myExt=punchExt(animState.myPunch)*ease*.7;oppExt=punchExt(animState.oppPunch)*ease*.7;myHit=oppHit=ease>.55;}
   }
 
-  // ── PERSPECTIVE LAYOUT ──
-  // Opponent: centered-right, mid distance
+  // Opponent: centered-right, mid distance, facing player
   const oppScale=w*.22;
-  const oppX=w*.58,oppY=h*.55;
+  const oppX=w*.62,oppY=h*.72;
   drawOakTree(ctx,oppX,oppY,oppScale,true,oppEquippedGlove,oppExt,oppHit,animState.oppPunch,animState.phase);
 
   // Player: bottom-left, large, from behind over right shoulder
   const myScale=w*.48;
-  const myX=w*.18,myY=h*.95;
+  const myX=w*.16,myY=h*.98;
   drawOakTreeBack(ctx,myX,myY,myScale,equippedGlove,myExt,myHit,animState.myPunch,animState.phase);
 }
 
@@ -767,22 +866,18 @@ function drawOakTree(ctx,cx,baseY,size,facingLeft,glove,punchExt,isHit,punchType
   const tw=20*s,th=72*s;
   const shoulderY=baseY-th*.6;
 
-  // Trunk
   const tg=ctx.createLinearGradient(cx-tw/2,baseY-th,cx+tw/2,baseY);
   tg.addColorStop(0,'#6b3f1f');tg.addColorStop(.5,'#8b5a2b');tg.addColorStop(1,'#5c3318');
   ctx.fillStyle=tg;ctx.beginPath();ctx.roundRect(cx-tw/2,baseY-th,tw,th,3*s);ctx.fill();
-  // Bark lines
   ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=1.2*s;
   for(let i=1;i<4;i++){ctx.beginPath();ctx.moveTo(cx-tw/2+3*s,baseY-th*(i/4));ctx.bezierCurveTo(cx,baseY-th*(i/4)+4*s,cx,baseY-th*(i/4)-4*s,cx+tw/2-3*s,baseY-th*(i/4));ctx.stroke();}
 
-  // Canopy
   const cy2=baseY-th-8*s;
   ctx.fillStyle='rgba(0,0,0,.15)';ctx.beginPath();ctx.ellipse(cx,cy2+4*s,34*s,9*s,0,0,Math.PI*2);ctx.fill();
   [[0,0,38*s,32*s,'#2d5a1b'],[-.12,-.1,32*s,27*s,'#3a7a22'],[.12,-.08,30*s,25*s,'#336a1e'],[0,-.16,26*s,21*s,'#4a8a2a']].forEach(([dx,dy,rw,rh,col])=>{
     ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(cx+dx*size,cy2+dy*size,rw,rh,0,0,Math.PI*2);ctx.fill();
   });
 
-  // Face
   const fy=baseY-th+14*s;
   const shake=isHit?Math.sin(animState.frame*.9)*2*s:0;
   [[cx-6*s,fy+shake],[cx+6*s,fy+shake]].forEach(([ex,ey])=>{
@@ -796,59 +891,46 @@ function drawOakTree(ctx,cx,baseY,size,facingLeft,glove,punchExt,isHit,punchType
   if(isHit){ctx.fillStyle='#1a0800';ctx.beginPath();ctx.ellipse(cx,fy+7*s,2.5*s,3.5*s,0,0,Math.PI*2);ctx.fill();}
   else{ctx.beginPath();ctx.moveTo(cx-4*s,fy+6*s);ctx.lineTo(cx+4*s,fy+6*s);ctx.stroke();}
 
-  // Arms
   let leadExt=punchExt,leadY=0;
   if(punchType&&phase==='clash'){
     if(punchType==='uppercut'){leadY=-punchExt*.7;leadExt*=.4;}
     else if(punchType==='hook'){leadY=punchExt*.25;leadExt*=.65;}
     else if(punchType==='overhand'){leadY=-punchExt*.4;leadExt*=.75;}
   }
-  // Rear guard arm
   drawBranch(ctx,cx,shoulderY,-tw/2-3*s,44*s*.6,12*s,s,'#7a4a22',false,false,glove,0,0);
-  // Lead punching arm
   drawBranch(ctx,cx,shoulderY,tw/2+3*s,44*s,12*s,s,'#8b5a2b',true,isHit&&phase==='clash',glove,leadExt,leadY);
   ctx.restore();
 }
 
-// ── DRAW OAK FROM BEHIND (player POV — large, bottom-left, over right shoulder) ──
+// ── DRAW OAK FROM BEHIND (player POV) ──
 function drawOakTreeBack(ctx,cx,baseY,size,glove,punchExt,isHit,punchType,phase){
   ctx.save();
   const s=size/100;
   const tw=24*s,th=90*s;
   const shoulderY=baseY-th*.55;
 
-  // Only show partial trunk (cut off by bottom of screen)
-  // Trunk back — darker, seen from behind
   const tg=ctx.createLinearGradient(cx-tw/2,baseY-th,cx+tw/2,baseY);
   tg.addColorStop(0,'#4a2e14');tg.addColorStop(.5,'#6b3f1f');tg.addColorStop(1,'#3a2010');
   ctx.fillStyle=tg;ctx.beginPath();ctx.roundRect(cx-tw/2,baseY-th,tw,th+60*s,4*s);ctx.fill();
-  // Bark texture
   ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1.5*s;
   for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(cx-tw/2+3*s,baseY-th*(i/5));ctx.bezierCurveTo(cx,baseY-th*(i/5)+5*s,cx,baseY-th*(i/5)-5*s,cx+tw/2-3*s,baseY-th*(i/5));ctx.stroke();}
 
-  // Canopy — seen from below/behind, darker underside
   const cty=baseY-th-6*s;
-  // Underside shadow
   ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(cx,cty+2*s,44*s,14*s,0,0,Math.PI*2);ctx.fill();
-  // Canopy layers from behind — show bottom/back of canopy
   [[0,.05,46*s,18*s,'#1e3f12'],[-.1,.02,40*s,15*s,'#254d15'],[.1,.02,38*s,14*s,'#1e3f12'],[0,-.08,34*s,22*s,'#2d5a1b'],[0,-.18,28*s,20*s,'#3a7a22']].forEach(([dx,dy,rw,rh,col])=>{
     ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(cx+dx*size,cty+dy*size,rw,rh,0,0,Math.PI*2);ctx.fill();
   });
-  // Back of head/face — just the back of the bark head, no face visible
   const headY=baseY-th+10*s;
   ctx.fillStyle='#5c3318';ctx.beginPath();ctx.ellipse(cx,headY,14*s,16*s,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#4a2810';ctx.beginPath();ctx.ellipse(cx,headY,10*s,12*s,0,0,Math.PI*2);ctx.fill();
 
-  // Right shoulder arm extends to the right (main punching arm from player's POV)
   let leadExt=punchExt,leadY=0;
   if(punchType&&phase==='clash'){
     if(punchType==='uppercut'){leadY=-punchExt*.8;leadExt*=.5;}
     else if(punchType==='hook'){leadY=punchExt*.3;leadExt*=.7;}
     else if(punchType==='overhand'){leadY=-punchExt*.5;leadExt*=.8;}
   }
-  // Left arm (guard, less visible from back-right perspective)
   drawBranchBack(ctx,cx,shoulderY,-tw/2-2*s,40*s*.5,14*s,s,'#5c3318',false,false,glove,0,4*s);
-  // Right arm — the main visible punching arm, extends toward opponent (right side)
   drawBranchBack(ctx,cx,shoulderY,tw/2+2*s,50*s,14*s,s,'#6b3f1f',true,isHit&&phase==='clash',glove,leadExt,leadY);
   ctx.restore();
 }
@@ -866,7 +948,6 @@ function drawBranch(ctx,cx,sy,startX,len,w,s,col,isLead,flash,glove,extX,extY){
 }
 
 function drawBranchBack(ctx,cx,sy,startX,len,w,s,col,isLead,flash,glove,extX,extY){
-  // From back POV — arm goes outward and forward (toward top of screen = depth)
   const ex=cx+startX+(isLead?(len+extX)*.9:len*.3);
   const ey=sy+(isLead?(-len*.3+extY):2*s);
   const mx=cx+startX+(isLead?len*.45:len*.2);
@@ -952,7 +1033,6 @@ function drawGrandCanopy(ctx,w,h){
     ctx.fillStyle=spot;ctx.fillRect(0,0,w,h);
   }
   drawCrowd(ctx,w,h*.36,'#05080f','#0a1020');
-  [[h*.3,h*.36,h*.42],[`rgba(200,168,80,.55)`,`rgba(255,255,255,.45)`,`rgba(200,168,80,.55)`]].forEach(()=>{});
   const ropeCols=['rgba(200,168,80,.6)','rgba(255,255,255,.45)','rgba(200,168,80,.6)'];
   [h*.3,h*.36,h*.42].forEach((y,i)=>{ctx.strokeStyle=ropeCols[i];ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();});
   [[w*.04,h*.26],[w*.96,h*.26]].forEach(([x,y])=>{ctx.fillStyle='#b0b0b0';ctx.fillRect(x-4,y,8,h*.2);ctx.fillStyle='#909090';ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();});
@@ -977,7 +1057,6 @@ function drawCharPreview(){
   const ctx=cv.getContext('2d');
   const bg=ctx.createLinearGradient(0,0,0,160);bg.addColorStop(0,'#1a3a0a');bg.addColorStop(1,'#0a1a05');
   ctx.fillStyle=bg;ctx.fillRect(0,0,110,160);
-  // Full character centered
   drawOakTree(ctx,55,148,72,false,equippedGlove,0,false,null,'idle');
 }
 
@@ -987,7 +1066,6 @@ function drawMenuArena(tier){
   cv.width=cv.offsetWidth||420;cv.height=cv.offsetHeight||180;
   const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
   drawArenaBackground(ctx,w,h,tier);
-  // No trees on menu — just the arena atmosphere
 }
 
 // ── INIT ──
