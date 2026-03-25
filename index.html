@@ -151,13 +151,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .timer-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
 .timer-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .1s linear}
 .timer-num{font-size:.62rem;color:var(--gold);font-weight:700;min-width:14px;text-align:right}
-.punch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
-.punch-btn{border:1px solid var(--border);background:var(--card);border-radius:9px;padding:9px 3px 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .12s;user-select:none;pointer-events:all}
-.punch-btn:active{transform:scale(.93);background:rgba(200,168,80,.1)}
+.punch-grid{display:flex;flex-direction:column;gap:6px}
+.punch-btn{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:11px 16px;cursor:pointer;display:flex;flex-direction:row;align-items:center;gap:12px;transition:all .12s;user-select:none;pointer-events:all;width:100%}
+.punch-btn:active{transform:scale(.98);background:rgba(200,168,80,.1)}
 .punch-btn.selected{border-color:var(--gold);background:rgba(200,168,80,.12)}
 .punch-btn.disabled{opacity:.32;pointer-events:none}
-.punch-btn .pi{font-size:1.2rem}
-.punch-btn .pn{font-size:.48rem;letter-spacing:.5px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.punch-btn .pi{font-size:1.4rem;min-width:28px;text-align:center}
+.punch-btn .pn{font-size:.78rem;letter-spacing:1.5px;color:var(--text);font-weight:700;text-transform:uppercase;flex:1;text-align:left}
 .wait-msg{text-align:center;font-size:.72rem;color:var(--gold);padding:5px;margin-top:2px}
 
 /* MATCH END */
@@ -400,7 +400,8 @@ const BEATS={jab:['hook','uppercut'],cross:['jab','overhand'],hook:['cross','upp
 const PUNCHES=['jab','cross','hook','uppercut','overhand'];
 
 // ── SESSION STATE ──
-let myPts=0,myHP=100,oppHP=100,roundNum=0;
+const MAX_HP=30; // 3 hits of 10 = match over. change back to 100 for production.
+let myPts=0,myHP=MAX_HP,oppHP=MAX_HP,roundNum=0;
 let myPunch=null,oppPunch=null,timerInt=null,timerLeft=5;
 let ws=null,matchReady=false;
 let streetName='Anonymous';
@@ -453,17 +454,22 @@ function connectWS(onOpen){
 function closeWS(){if(ws){try{ws.close();}catch(e){}ws=null;}}
 function sendWS(obj){if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify(obj));}
 
+// opponent cosmetics: wait for player_info before starting match
+let oppInfoReceived=false;
+
 function handleServerMsg(m){
   if(m.type==='queued') document.getElementById('search-sub').textContent='🌱 In queue ('+m.position+' searching)...';
   if(m.type==='match_found'){
     matchReady=true;
-    // Send our cosmetic info to opponent
+    oppInfoReceived=false;
+    // Send our cosmetic info
     sendWS({type:'player_info',glove:equippedGlove});
-    setTimeout(()=>startMatch(),500);
+    // Wait briefly for opponent info then start
+    setTimeout(()=>startMatch(),900);
   }
   if(m.type==='player_info'){
-    // Receive opponent's cosmetic choices
     oppEquippedGlove=m.glove||'bare';
+    oppInfoReceived=true;
   }
   if(m.type==='room_created'){document.getElementById('my-code').textContent=m.code;document.getElementById('create-status').textContent='⏳ Waiting for opponent...';}
   if(m.type==='room_error'){const n=document.getElementById('join-note');n.textContent='⚠️ '+m.message;n.classList.add('err-note');}
@@ -540,7 +546,7 @@ function showTutorial(){
 function drawTutorialPentagon(){
   const cv=document.getElementById('tut-canvas');
   const ctx=cv.getContext('2d');
-  const W=340,H=360,cx=W/2,cy=H/2+10;
+  const W=340,H=360,cx=W/2,cy=H/2+28;
   cv.width=W;cv.height=H;
   const PR=118,NR=26,LR=PR+52;
   const labels=['JAB','CROSS','HOOK','UPPERCUT','OVERHAND'];
@@ -556,11 +562,11 @@ function drawTutorialPentagon(){
   const bg=ctx.createRadialGradient(cx,cy,5,cx,cy,200);
   bg.addColorStop(0,'#131f13');bg.addColorStop(1,'#0a0f0a');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  // Title
+  // Title — raised to top
   ctx.fillStyle='#c8a850';ctx.font='bold 13px Segoe UI';ctx.textAlign='center';
-  ctx.fillText('PUNCH MATRIX — Arrow = Wins',cx,22);
+  ctx.fillText('PUNCH MATRIX — Arrow = Wins',cx,18);
   ctx.fillStyle='#5a7a5a';ctx.font='10px Segoe UI';
-  ctx.fillText('Same punch = DRAW (both take damage)',cx,38);
+  ctx.fillText('Same punch = DRAW (both take damage)',cx,32);
   // Pentagon outline
   ctx.strokeStyle='rgba(200,168,80,.1)';ctx.lineWidth=1;
   ctx.beginPath();pts.forEach((p,i)=>{i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});ctx.closePath();ctx.stroke();
@@ -616,7 +622,7 @@ function claimFirstBlood(){
 
 // ── MATCH ──
 function startMatch(){
-  myHP=100;oppHP=100;roundNum=0;myPunch=null;oppPunch=null;
+  myHP=MAX_HP;oppHP=MAX_HP;roundNum=0;myPunch=null;oppPunch=null;
   animState={phase:'idle',myPunch:null,oppPunch:null,result:null,frame:0,maxFrames:45};
   updateHP();showScreen('match');
   resizeMatchCanvas();
@@ -670,8 +676,8 @@ function revealResult(){
   setTimeout(()=>{animState.phase='idle';if(myHP<=0||oppHP<=0)endMatch();else newRound();},1800);
 }
 function updateHP(){
-  document.getElementById('hp-you').style.width=myHP+'%';
-  document.getElementById('hp-opp').style.width=oppHP+'%';
+  document.getElementById('hp-you').style.width=(myHP/MAX_HP*100)+'%';
+  document.getElementById('hp-opp').style.width=(oppHP/MAX_HP*100)+'%';
   document.getElementById('hp-you-n').textContent=myHP;
   document.getElementById('hp-opp-n').textContent=oppHP;
 }
@@ -973,9 +979,7 @@ function drawMenuArena(tier){
   cv.width=cv.offsetWidth||420;cv.height=cv.offsetHeight||180;
   const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
   drawArenaBackground(ctx,w,h,tier);
-  // Two small oaks facing each other
-  drawOakTree(ctx,w*.3,h*.95,w*.16,false,equippedGlove,0,false,null,'idle');
-  drawOakTree(ctx,w*.7,h*.95,w*.16,true,'bare',0,false,null,'idle');
+  // No trees on menu — just the arena atmosphere
 }
 
 // ── INIT ──
