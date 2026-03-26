@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GROUNDED — index.html — Version 28 -->
+<!-- GROUNDED — index.html — Version 29 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -579,7 +579,7 @@ function connectWS(onOpen){
   ws.onclose=()=>{
     clearTimeout(t);
     if(document.getElementById('match').classList.contains('active')&&matchReady){
-      clearInterval(timerInt);alert('Opponent disconnected.');goMenu();
+      clearInterval(timerInt);matchReady=false;alert('Opponent disconnected.');goMenu();
     }
   };
 }
@@ -603,7 +603,7 @@ function handleServerMsg(m){
   if(m.type==='room_created'){document.getElementById('my-code').textContent=m.code;document.getElementById('create-status').textContent='⏳ Waiting for opponent...';}
   if(m.type==='room_error'){const n=document.getElementById('join-note');n.textContent='⚠️ '+m.message;n.classList.add('err-note');}
   if(m.type==='punch'){oppPunch=m.punch;checkReveal();}
-  if(m.type==='opponent_disconnected'){clearInterval(timerInt);alert('Opponent disconnected.');goMenu();}
+  if(m.type==='opponent_disconnected'){if(matchReady){clearInterval(timerInt);matchReady=false;alert('Opponent disconnected.');goMenu();}}
 }
 
 // ── NAV ──
@@ -740,6 +740,7 @@ function claimFirstBlood(){
   if(name.length>0)streetName=name;
   unlockBandage();
   document.getElementById('fb-modal').classList.remove('show');
+  if(endReturnTimer)clearTimeout(endReturnTimer);
   goMenu();
 }
 
@@ -805,19 +806,48 @@ function updateHP(){
   document.getElementById('hp-opp-n').textContent=oppHP;
 }
 function setPunchBtns(on){document.querySelectorAll('.punch-btn').forEach(b=>{b.classList.toggle('disabled',!on);if(on)b.classList.remove('selected');});}
+let endReturnTimer=null;
 function endMatch(){
-  clearInterval(timerInt);matchesPlayed++;
+  clearInterval(timerInt);
+  matchReady=false; // prevent ws.onclose from hijacking navigation
+  matchesPlayed++;
   const win=oppHP<myHP,draw=myHP===oppHP;
   const el=document.getElementById('end-res');
   let d=0;
-  if(draw){el.textContent='DRAW';el.className='end-result';d=0;document.getElementById('end-sub').textContent='Roots held firm on both sides.';}
-  else if(win){el.textContent='VICTORY';el.className='end-result win';d=100;document.getElementById('end-sub').textContent='The forest bows to you.';}
-  else{el.textContent='FALLEN';el.className='end-result lose';d=-100;document.getElementById('end-sub').textContent='Even ancient oaks fall sometimes.';}
+  if(draw){
+    el.textContent='DRAW';el.className='end-result draw';d=0;
+    document.getElementById('end-icon').textContent='🤝';
+    document.getElementById('end-sub').textContent='Roots held firm on both sides.';
+  } else if(win){
+    el.textContent='VICTORY';el.className='end-result win';d=100;
+    document.getElementById('end-icon').textContent='🏆';
+    document.getElementById('end-sub').textContent='The forest bows to you.';
+  } else {
+    el.textContent='FALLEN';el.className='end-result lose';d=-100;
+    document.getElementById('end-icon').textContent='💀';
+    document.getElementById('end-sub').textContent='Even ancient oaks fall sometimes.';
+  }
   myPts=Math.max(0,myPts+d);
   document.getElementById('end-pts').innerHTML=(d>=0?'+':'')+d+' pts → <span>'+myPts+'</span> total';
   document.getElementById('end-rank').textContent=['🌱','🌿','🌳'][getRankTier(myPts)]+' '+getRank(myPts).name;
-  sendWS({type:'match_over'});stopMatchLoop();showScreen('matchend');
+  sendWS({type:'match_over'});
+  stopMatchLoop();
+  showScreen('matchend');
+  // Auto-return countdown bar
+  const fill=document.getElementById('end-auto-fill');
+  fill.style.transition='none';fill.style.width='100%';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    fill.style.transition='width 2s linear';fill.style.width='0%';
+  }));
+  if(endReturnTimer)clearTimeout(endReturnTimer);
+  endReturnTimer=setTimeout(()=>{
+    if(document.getElementById('matchend').classList.contains('active'))goMenu();
+  },2000);
   if(matchesPlayed===1)checkFirstBlood();
+}
+function goMenuFromEnd(){
+  if(endReturnTimer)clearTimeout(endReturnTimer);
+  goMenu();
 }
 function goMenu(){closeWS();stopMatchLoop();updateMenuRank();showScreen('menu');}
 
