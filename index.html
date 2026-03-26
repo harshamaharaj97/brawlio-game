@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GROUNDED — index.html — Version 30 -->
+<!-- GROUNDED — index.html — Version 35 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -111,19 +111,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 #tut-canvas{border-radius:8px;width:100%;max-width:340px}
 .tut-close{width:100%;padding:12px;border:none;border-radius:8px;background:var(--leaf);color:#fff;font-weight:800;font-size:.85rem;cursor:pointer;letter-spacing:2px}
 
-/* FIRST BLOOD MODAL */
-#fb-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-#fb-modal.show{display:flex}
-.fb-card{background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:24px;width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;gap:12px}
-.fb-title{font-size:1.3rem;font-weight:900;color:var(--gold);letter-spacing:2px}
-.fb-sub{font-size:.82rem;color:var(--muted);line-height:1.6}
-.fb-reward{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;text-align:left}
-.fb-reward-icon{font-size:1.8rem}
-.fb-reward-name{font-size:.82rem;font-weight:700;color:var(--gold)}
-.fb-reward-desc{font-size:.68rem;color:var(--muted);margin-top:2px}
-.name-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:8px;font-size:.95rem;text-align:center;outline:none;letter-spacing:2px;text-transform:uppercase}
-.name-input:focus{border-color:var(--gold)}
-.fb-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--leaf),var(--lightleaf));color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;letter-spacing:2px}
+/* FIRST BLOOD MODAL CSS removed v33 — merged into matchend */
 
 /* ═══════════════════════════════════════════════
    MATCH SCREEN — Version 27
@@ -135,10 +123,12 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 #match{
   padding:0;
   overflow:hidden;
-  display:flex;
   flex-direction:column;
   height:100vh;
   height:100dvh;
+}
+#match.active{
+  display:flex;
 }
 
 /* SECTION 1 — HP BARS */
@@ -284,15 +274,32 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 .punch-btn .pn{font-size:.72rem;letter-spacing:1.5px;color:var(--text);font-weight:700;text-transform:uppercase;flex:1;text-align:left}
 
 /* MATCH END */
-#matchend{justify-content:center;gap:14px;text-align:center;background:var(--bg);padding:40px 24px}
-.end-result{font-size:2.8rem;font-weight:900;letter-spacing:2px}
-.end-result.win{color:var(--green)}
-.end-result.lose{color:var(--red)}
-.end-sub{font-size:.78rem;color:var(--muted);letter-spacing:1px}
-.end-pts{font-size:.92rem;color:var(--muted)}
+#matchend{justify-content:center;align-items:center;gap:14px;text-align:center;background:var(--bg);padding:32px 24px;overflow-y:auto}
+.end-icon{font-size:3rem;line-height:1}
+.end-result{font-size:3rem;font-weight:900;letter-spacing:3px;line-height:1}
+.end-result.win{color:var(--green);text-shadow:0 0 24px rgba(46,204,113,.45)}
+.end-result.lose{color:var(--red);text-shadow:0 0 24px rgba(230,57,70,.45)}
+.end-result.draw{color:var(--gold);text-shadow:0 0 24px rgba(200,168,80,.45)}
+.end-sub{font-size:.8rem;color:var(--muted);letter-spacing:1px;font-style:italic}
+.end-pts{font-size:.9rem;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 20px;width:100%}
 .end-pts span{color:var(--gold);font-weight:700}
-.btn-back{background:var(--card);color:var(--text);border:1px solid var(--border);padding:13px 36px;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:2px;text-transform:uppercase}
-.btn-back:hover{border-color:var(--gold)}
+.end-rank-badge{font-size:.85rem;color:var(--gold);font-weight:700;letter-spacing:2px}
+.end-reward{display:none;background:var(--card);border:2px solid var(--gold);border-radius:12px;padding:14px;width:100%;text-align:left;gap:12px;align-items:center}
+.end-reward.show{display:flex}
+.end-reward-icon{font-size:2rem;flex-shrink:0}
+.end-reward-title{font-size:.7rem;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase}
+.end-reward-name{font-size:.9rem;font-weight:700;color:var(--text);margin-top:2px}
+.end-reward-desc{font-size:.68rem;color:var(--muted);margin-top:2px}
+.end-name-row{display:none;flex-direction:column;gap:6px;width:100%}
+.end-name-row.show{display:flex}
+.end-name-label{font-size:.65rem;letter-spacing:2px;color:var(--muted);text-align:left}
+.end-name-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;font-size:.9rem;text-align:center;outline:none;letter-spacing:2px;text-transform:uppercase}
+.end-name-input:focus{border-color:var(--gold)}
+.end-auto-bar{width:100%;height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.end-auto-fill{height:100%;background:var(--gold);border-radius:2px;width:100%}
+.end-auto-label{font-size:.6rem;color:var(--muted);letter-spacing:1px;opacity:.6}
+.btn-back{background:var(--card);color:var(--text);border:1px solid var(--border);padding:13px 36px;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:2px;text-transform:uppercase;width:100%}
+.btn-back:active{border-color:var(--gold);color:var(--gold)}
 </style>
 </head>
 <body>
@@ -450,20 +457,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
   </div>
 </div>
 
-<!-- FIRST BLOOD MODAL -->
-<div id="fb-modal">
-  <div class="fb-card">
-    <div class="fb-title">🩸 FIRST BLOOD</div>
-    <div class="fb-sub">You survived your first fight. The roots know your name now.</div>
-    <div class="fb-reward">
-      <div class="fb-reward-icon">🩹</div>
-      <div><div class="fb-reward-name">Bandage Wraps</div><div class="fb-reward-desc">White hand wraps. Every brawler's first armor.</div></div>
-    </div>
-    <div style="font-size:.78rem;color:var(--muted);text-align:left">Enter your street name:</div>
-    <input class="name-input" id="street-name-input" placeholder="YOUR STREET NAME" maxlength="16" oninput="this.value=this.value.toUpperCase()"/>
-    <button class="fb-btn" onclick="claimFirstBlood()">CLAIM REWARD</button>
-  </div>
-</div>
+<!-- FIRST BLOOD MODAL removed v33 — reward merged into matchend screen -->
 
 <!-- MATCH — Version 26: 5 stacked sections, zero overlap -->
 <div class="screen" id="match">
@@ -517,13 +511,28 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 
 <!-- MATCH END -->
 <div class="screen" id="matchend">
-  <div class="end-icon" id="end-icon">🏆</div>
+  <div class="end-icon" id="end-icon"></div>
   <div class="end-result" id="end-res"></div>
   <div class="end-sub" id="end-sub"></div>
   <div class="end-pts" id="end-pts"></div>
-  <div style="font-size:.88rem;color:var(--gold);font-weight:700;letter-spacing:1px" id="end-rank"></div>
+  <div class="end-rank-badge" id="end-rank"></div>
+  <!-- Reward card — shown only when a reward was earned this match -->
+  <div class="end-reward" id="end-reward">
+    <div class="end-reward-icon" id="end-reward-icon"></div>
+    <div>
+      <div class="end-reward-title">🎁 Reward Unlocked</div>
+      <div class="end-reward-name" id="end-reward-name"></div>
+      <div class="end-reward-desc" id="end-reward-desc"></div>
+    </div>
+  </div>
+  <!-- Street name input — shown only on first match reward -->
+  <div class="end-name-row" id="end-name-row">
+    <div class="end-name-label">Enter your street name:</div>
+    <input class="end-name-input" id="end-name-input" placeholder="YOUR STREET NAME" maxlength="16" oninput="this.value=this.value.toUpperCase()"/>
+  </div>
   <div class="end-auto-bar"><div class="end-auto-fill" id="end-auto-fill"></div></div>
-  <button class="btn-back" id="end-back-btn" onclick="goMenuFromEnd()">← Back to Roots</button>
+  <div class="end-auto-label" id="end-auto-label">Returning to roots...</div>
+  <button class="btn-back" onclick="goMenuFromEnd()">← Back to Roots</button>
 </div>
 
 </div>
@@ -735,22 +744,14 @@ function drawTutorialPentagon(){
 }
 
 // ── FIRST BLOOD ──
-function checkFirstBlood(){
-  if(!firstBloodClaimed){firstBloodClaimed=true;setTimeout(()=>document.getElementById('fb-modal').classList.add('show'),600);}
-}
-function claimFirstBlood(){
-  const name=document.getElementById('street-name-input').value.trim();
-  if(name.length>0)streetName=name;
-  unlockBandage();
-  document.getElementById('fb-modal').classList.remove('show');
-  if(endReturnTimer)clearTimeout(endReturnTimer);
-  goMenu();
-}
+// checkFirstBlood and claimFirstBlood removed v33 — logic merged into endMatch
 
 // ── MATCH ──
 function startMatch(){
   myHP=MAX_HP;oppHP=MAX_HP;roundNum=0;myPunch=null;oppPunch=null;
   matchEnded=false;cpuMode=false;
+  if(endReturnTimer){clearTimeout(endReturnTimer);endReturnTimer=null;}
+  if(revealTimer){clearTimeout(revealTimer);revealTimer=null;}
   animState={phase:'idle',myPunch:null,oppPunch:null,result:null,frame:0,maxFrames:45};
   updateHP();showScreen('match');
   resizeMatchCanvas();
@@ -806,7 +807,8 @@ function revealResult(){
   else{rh.textContent='💥 DRAW';rh.style.color='#c8a850';}
   rd.textContent=myPunch.toUpperCase()+' vs '+oppPunch.toUpperCase();
   document.getElementById('res-banner').classList.add('show');
-  setTimeout(()=>{animState.phase='idle';if(myHP<=0||oppHP<=0)endMatch();else newRound();},1800);
+  if(revealTimer)clearTimeout(revealTimer);
+  revealTimer=setTimeout(()=>{revealTimer=null;animState.phase='idle';if(myHP<=0||oppHP<=0)endMatch();else newRound();},900);
 }
 function updateHP(){
   document.getElementById('hp-you').style.width=(myHP/MAX_HP*100)+'%';
@@ -816,55 +818,87 @@ function updateHP(){
 }
 function setPunchBtns(on){document.querySelectorAll('.punch-btn').forEach(b=>{b.classList.toggle('disabled',!on);if(on)b.classList.remove('selected');});}
 let endReturnTimer=null;
+let revealTimer=null;
 function endMatch(){
   if(matchEnded)return; // guard against double-call
   clearInterval(timerInt);
-  matchEnded=true;  // set FIRST — blocks ws.onclose and opponent_disconnected
+  matchEnded=true;  // FIRST — blocks ws.onclose and opponent_disconnected
   matchReady=false;
   matchesPlayed++;
+  sendWS({type:'match_over'});
+  stopMatchLoop();
+
+  // ── Result ──
   const win=oppHP<myHP,draw=myHP===oppHP;
-  const el=document.getElementById('end-res');
   let d=0;
   if(draw){
-    el.textContent='DRAW';el.className='end-result draw';d=0;
+    document.getElementById('end-res').textContent='DRAW';
+    document.getElementById('end-res').className='end-result draw';
     document.getElementById('end-icon').textContent='🤝';
     document.getElementById('end-sub').textContent='Roots held firm on both sides.';
   } else if(win){
-    el.textContent='VICTORY';el.className='end-result win';d=100;
+    document.getElementById('end-res').textContent='VICTORY';
+    document.getElementById('end-res').className='end-result win';
     document.getElementById('end-icon').textContent='🏆';
     document.getElementById('end-sub').textContent='The forest bows to you.';
+    d=100;
   } else {
-    el.textContent='FALLEN';el.className='end-result lose';d=-100;
+    document.getElementById('end-res').textContent='FALLEN';
+    document.getElementById('end-res').className='end-result lose';
     document.getElementById('end-icon').textContent='💀';
     document.getElementById('end-sub').textContent='Even ancient oaks fall sometimes.';
+    d=-100;
   }
   myPts=Math.max(0,myPts+d);
   document.getElementById('end-pts').innerHTML=(d>=0?'+':'')+d+' pts → <span>'+myPts+'</span> total';
   document.getElementById('end-rank').textContent=['🌱','🌿','🌳'][getRankTier(myPts)]+' '+getRank(myPts).name;
-  sendWS({type:'match_over'});
-  stopMatchLoop();
+
+  // ── Reward: First Blood (match 1 only) ──
+  const isFirstBlood = matchesPlayed===1 && !firstBloodClaimed;
+  if(isFirstBlood){
+    firstBloodClaimed=true;
+    unlockBandage();
+    // Show reward card
+    document.getElementById('end-reward').classList.add('show');
+    document.getElementById('end-reward-icon').textContent='🩹';
+    document.getElementById('end-reward-name').textContent='Bandage Wraps';
+    document.getElementById('end-reward-desc').textContent="White hand wraps. Every brawler's first armor.";
+    // Show street name input
+    document.getElementById('end-name-row').classList.add('show');
+  } else {
+    document.getElementById('end-reward').classList.remove('show');
+    document.getElementById('end-name-row').classList.remove('show');
+  }
+
+  // ── Show screen ──
   showScreen('matchend');
-  // Auto-return countdown bar
+
+  // ── Auto-return bar ──
+  const autoSecs = isFirstBlood ? 8 : 4;
   const fill=document.getElementById('end-auto-fill');
   fill.style.transition='none';fill.style.width='100%';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    fill.style.transition='width 3s linear';fill.style.width='0%';
+    fill.style.transition='width '+autoSecs+'s linear';fill.style.width='0%';
   }));
+  document.getElementById('end-auto-label').textContent='Returning to roots in '+autoSecs+'s...';
   if(endReturnTimer)clearTimeout(endReturnTimer);
-  // First blood modal: delay so end screen renders first, and cancel auto-return while modal is open
-  if(matchesPlayed===1){
-    setTimeout(()=>{
-      checkFirstBlood();
-      // don't auto-return while first blood modal is showing
-    },400);
-  } else {
-    endReturnTimer=setTimeout(()=>{
-      if(document.getElementById('matchend').classList.contains('active'))goMenu();
-    },3000);
-  }
+  endReturnTimer=setTimeout(()=>{
+    if(document.getElementById('matchend').classList.contains('active')&&matchEnded){
+      // Grab street name if entered before auto-return
+      if(isFirstBlood){
+        const n=document.getElementById('end-name-input').value.trim();
+        if(n.length>0)streetName=n;
+        updateMenuRank();
+      }
+      goMenu();
+    }
+  },autoSecs*1000);
 }
 function goMenuFromEnd(){
   if(endReturnTimer)clearTimeout(endReturnTimer);
+  // Save street name if entered on first blood end screen
+  const nameInput=document.getElementById('end-name-input');
+  if(nameInput && nameInput.value.trim().length>0)streetName=nameInput.value.trim();
   goMenu();
 }
 // ── CPU MATCH ──
