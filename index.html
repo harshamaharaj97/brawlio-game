@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GROUNDED — index.html — Version 29 -->
+<!-- GROUNDED — index.html — Version 30 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -321,6 +321,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
       <div class="rank-bar"><div class="rank-bar-fill" id="rb-fill" style="width:0%"></div></div>
     </div>
     <button class="btn-primary" onclick="goSearching()">🥊 FIND MATCH</button>
+    <button class="btn-secondary" style="background:rgba(200,168,80,.08);border-color:var(--gold);color:var(--gold);font-size:.72rem;padding:10px 8px;" onclick="startCPUMatch()">🤖 PRACTICE vs CPU</button>
     <div class="btn-row">
       <button class="btn-secondary" onclick="goCreateRoom()">🌿 CREATE ROOM</button>
       <button class="btn-secondary" onclick="goJoinRoom()">🔗 JOIN ROOM</button>
@@ -516,11 +517,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 
 <!-- MATCH END -->
 <div class="screen" id="matchend">
+  <div class="end-icon" id="end-icon">🏆</div>
   <div class="end-result" id="end-res"></div>
   <div class="end-sub" id="end-sub"></div>
   <div class="end-pts" id="end-pts"></div>
   <div style="font-size:.88rem;color:var(--gold);font-weight:700;letter-spacing:1px" id="end-rank"></div>
-  <button class="btn-back" onclick="goMenu()">← Back to Roots</button>
+  <div class="end-auto-bar"><div class="end-auto-fill" id="end-auto-fill"></div></div>
+  <button class="btn-back" id="end-back-btn" onclick="goMenuFromEnd()">← Back to Roots</button>
 </div>
 
 </div>
@@ -535,7 +538,7 @@ const PUNCHES=['jab','cross','hook','uppercut','overhand'];
 const MAX_HP=30;
 let myPts=0,myHP=MAX_HP,oppHP=MAX_HP,roundNum=0;
 let myPunch=null,oppPunch=null,timerInt=null,timerLeft=5;
-let ws=null,matchReady=false;
+let ws=null,matchReady=false,matchEnded=false,cpuMode=false;
 let streetName='Anonymous';
 let firstBloodClaimed=false,matchesPlayed=0;
 let equippedGlove='bare';
@@ -578,8 +581,8 @@ function connectWS(onOpen){
   ws.onerror=()=>{clearTimeout(t);if(!opened)onOpen(false,'Server unreachable');};
   ws.onclose=()=>{
     clearTimeout(t);
-    if(document.getElementById('match').classList.contains('active')&&matchReady){
-      clearInterval(timerInt);matchReady=false;alert('Opponent disconnected.');goMenu();
+    if(document.getElementById('match').classList.contains('active')&&matchReady&&!matchEnded){
+      clearInterval(timerInt);matchReady=false;matchEnded=true;alert('Opponent disconnected.');goMenu();
     }
   };
 }
@@ -603,7 +606,7 @@ function handleServerMsg(m){
   if(m.type==='room_created'){document.getElementById('my-code').textContent=m.code;document.getElementById('create-status').textContent='⏳ Waiting for opponent...';}
   if(m.type==='room_error'){const n=document.getElementById('join-note');n.textContent='⚠️ '+m.message;n.classList.add('err-note');}
   if(m.type==='punch'){oppPunch=m.punch;checkReveal();}
-  if(m.type==='opponent_disconnected'){if(matchReady){clearInterval(timerInt);matchReady=false;alert('Opponent disconnected.');goMenu();}}
+  if(m.type==='opponent_disconnected'){if(matchReady&&!matchEnded){clearInterval(timerInt);matchReady=false;matchEnded=true;alert('Opponent disconnected.');goMenu();}}
 }
 
 // ── NAV ──
@@ -747,6 +750,7 @@ function claimFirstBlood(){
 // ── MATCH ──
 function startMatch(){
   myHP=MAX_HP;oppHP=MAX_HP;roundNum=0;myPunch=null;oppPunch=null;
+  matchEnded=false;cpuMode=false;
   animState={phase:'idle',myPunch:null,oppPunch:null,result:null,frame:0,maxFrames:45};
   updateHP();showScreen('match');
   resizeMatchCanvas();
@@ -779,7 +783,12 @@ function selectPunch(p){
   setPunchBtns(false);
   document.getElementById('wait-msg').style.display='block';
   document.getElementById('round-lbl').textContent='Waiting for opponent...';
-  sendWS({type:'punch',punch:p});
+  if(cpuMode){
+    // CPU always picks jab — simulate slight delay like a real opponent
+    setTimeout(()=>{oppPunch='jab';checkReveal();},300+Math.random()*400);
+  } else {
+    sendWS({type:'punch',punch:p});
+  }
   checkReveal();
 }
 function checkReveal(){if(myPunch&&oppPunch)revealResult();}
@@ -808,8 +817,10 @@ function updateHP(){
 function setPunchBtns(on){document.querySelectorAll('.punch-btn').forEach(b=>{b.classList.toggle('disabled',!on);if(on)b.classList.remove('selected');});}
 let endReturnTimer=null;
 function endMatch(){
+  if(matchEnded)return; // guard against double-call
   clearInterval(timerInt);
-  matchReady=false; // prevent ws.onclose from hijacking navigation
+  matchEnded=true;  // set FIRST — blocks ws.onclose and opponent_disconnected
+  matchReady=false;
   matchesPlayed++;
   const win=oppHP<myHP,draw=myHP===oppHP;
   const el=document.getElementById('end-res');
@@ -837,17 +848,32 @@ function endMatch(){
   const fill=document.getElementById('end-auto-fill');
   fill.style.transition='none';fill.style.width='100%';
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    fill.style.transition='width 2s linear';fill.style.width='0%';
+    fill.style.transition='width 3s linear';fill.style.width='0%';
   }));
   if(endReturnTimer)clearTimeout(endReturnTimer);
-  endReturnTimer=setTimeout(()=>{
-    if(document.getElementById('matchend').classList.contains('active'))goMenu();
-  },2000);
-  if(matchesPlayed===1)checkFirstBlood();
+  // First blood modal: delay so end screen renders first, and cancel auto-return while modal is open
+  if(matchesPlayed===1){
+    setTimeout(()=>{
+      checkFirstBlood();
+      // don't auto-return while first blood modal is showing
+    },400);
+  } else {
+    endReturnTimer=setTimeout(()=>{
+      if(document.getElementById('matchend').classList.contains('active'))goMenu();
+    },3000);
+  }
 }
 function goMenuFromEnd(){
   if(endReturnTimer)clearTimeout(endReturnTimer);
   goMenu();
+}
+// ── CPU MATCH ──
+function startCPUMatch(){
+  matchReady=true;cpuMode=true;oppEquippedGlove='bare';
+  oppInfoReceived=true;
+  startMatch();
+  // Override cpuMode flag after startMatch resets it
+  cpuMode=true;
 }
 function goMenu(){closeWS();stopMatchLoop();updateMenuRank();showScreen('menu');}
 
