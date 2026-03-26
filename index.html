@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GROUNDED — index.html — Version 38 -->
+<!-- GROUNDED — index.html — Version 39 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -539,11 +539,21 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;mi
 <script>
 // ── CONSTANTS ──
 const SERVER_WS='wss://brawlio-server-production.up.railway.app';
+// ─────────────────────────────────────────────────────────────
+// [DEV — TEST] Rank thresholds are compressed to 100pt gaps
+// (Sapling 0–99, Barkened 100–199, Ancient 200+) for fast
+// rank progression during testing.
+// Change to 1000/2000 for production.
+// ─────────────────────────────────────────────────────────────
 const RANKS=[{name:'Sapling',min:0},{name:'Barkened',min:100},{name:'Ancient',min:200}];
 const BEATS={jab:['hook','uppercut'],cross:['jab','overhand'],hook:['cross','uppercut'],uppercut:['overhand','cross'],overhand:['hook','jab']};
 const PUNCHES=['jab','cross','hook','uppercut','overhand'];
 
 // ── SESSION STATE ──
+// ─────────────────────────────────────────────────────────────
+// [DEV — TEST] MAX_HP is set to 30 (3 hits ends match).
+// Change to 100 for production (10 hits per match).
+// ─────────────────────────────────────────────────────────────
 const MAX_HP=30;
 let myPts=0,myHP=MAX_HP,oppHP=MAX_HP,roundNum=0;
 let myPunch=null,oppPunch=null,timerInt=null,timerLeft=5;
@@ -855,6 +865,12 @@ function endMatch(){
     document.getElementById('end-sub').textContent='Even ancient oaks fall sometimes.';
     d=-100;
   }
+  // ─────────────────────────────────────────────────────────────
+  // [DEV — TEST] CPU matches award rank points, same as live
+  // matches. This is intentional for testing rank progression.
+  // Set d=0 when cpuMode is true to disable in production:
+  //   if(cpuMode) d=0;
+  // ─────────────────────────────────────────────────────────────
   myPts=Math.max(0,myPts+d);
   document.getElementById('end-pts').innerHTML=(d>=0?'+':'')+d+' pts → <span>'+myPts+'</span> total';
   document.getElementById('end-rank').textContent=['🌱','🌿','🌳'][getRankTier(myPts)]+' '+getRank(myPts).name;
