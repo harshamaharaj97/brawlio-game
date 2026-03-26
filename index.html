@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GROUNDED — index.html — Version 37 -->
+<!-- GROUNDED — index.html — Version 38 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -614,7 +614,7 @@ function handleServerMsg(m){
   }
   if(m.type==='room_created'){document.getElementById('my-code').textContent=m.code;document.getElementById('create-status').textContent='⏳ Waiting for opponent...';}
   if(m.type==='room_error'){const n=document.getElementById('join-note');n.textContent='⚠️ '+m.message;n.classList.add('err-note');}
-  if(m.type==='punch'){oppPunch=m.punch;checkReveal();}
+  if(m.type==='punch'){if(!matchEnded){oppPunch=m.punch;checkReveal();}}
   if(m.type==='opponent_disconnected'){if(matchReady&&!matchEnded){clearInterval(timerInt);matchReady=false;matchEnded=true;alert('Opponent disconnected.');goMenu();}}
 }
 
@@ -625,7 +625,7 @@ function goSearching(){
   connectWS((ok,err)=>{
     if(!ok){document.getElementById('search-sub').textContent='⚠️ '+(err||'Connection failed.');return;}
     document.getElementById('search-sub').textContent='Searching for an opponent...';
-    sendWS({type:'find_match',tier:getRankTier(myPts)});
+    sendWS({type:'find_match',tier:getRankTier(myPts),pts:myPts});
   });
 }
 function cancelSearch(){sendWS({type:'cancel_match'});closeWS();showScreen('menu');}
@@ -794,6 +794,7 @@ function selectPunch(p){
 }
 function checkReveal(){if(myPunch&&oppPunch)revealResult();}
 function revealResult(){
+  if(matchEnded)return; // guard: don't run if match already over
   document.getElementById('wait-msg').style.display='none';
   const res=myPunch===oppPunch?'draw':BEATS[myPunch].includes(oppPunch)?'win':'lose';
   animState={phase:'clash',myPunch,oppPunch,result:res,frame:0,maxFrames:45};
@@ -808,7 +809,12 @@ function revealResult(){
   rd.textContent=myPunch.toUpperCase()+' vs '+oppPunch.toUpperCase();
   document.getElementById('res-banner').classList.add('show');
   if(revealTimer)clearTimeout(revealTimer);
-  revealTimer=setTimeout(()=>{revealTimer=null;animState.phase='idle';if(myHP<=0||oppHP<=0)endMatch();else newRound();},900);
+  revealTimer=setTimeout(()=>{
+    revealTimer=null;
+    if(matchEnded)return; // guard: match may have ended while banner was showing
+    animState.phase='idle';
+    if(myHP<=0||oppHP<=0)endMatch();else newRound();
+  },900);
 }
 function updateHP(){
   document.getElementById('hp-you').style.width=(myHP/MAX_HP*100)+'%';
